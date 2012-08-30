@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+      canvas {
+        border: 1px solid #9C9898;
+      }
+    </style>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.0.js"></script>
+    <script>
+      
+    function loadImages(sources, callback) {
+        var images = [];
+        var loadedImages = 0;
+        var numImages = sources.length;
+		
+		for(var i = 0; i < numImages; i++) {
+			images[i] = {};
+			images[i].text = sources[i].text;
+			images[i].x = sources[i].x;
+			images[i].y = sources[i].y;
+			images[i].width = sources[i].width;
+			images[i].height = sources[i].height;
+			images[i].img = new Image();
+			images[i].img.src =  sources[i].image;
+			images[i].img.onload = function() {
+				if(++loadedImages >= numImages) {
+					callback(images);
+				}
+			};
+		}
+    }
+	  
+    function initStage(images) {		
+        var stage = new Kinetic.Stage({
+          container: 'container',
+          width: 480,
+          height: 640
+        });
+
+        var shapesLayer = new Kinetic.Layer();
+		
+		for (var i = 0 ; i < images.length; i ++) {
+			var group = new Kinetic.Group({
+				draggable : true
+			});
+			var icon = new Kinetic.Image({
+				image		: images[i].img,
+				x			: images[i].x,
+				y			: images[i].y,
+				width		: images[i].width,
+				height		: images[i].height
+			});
+			var label = new Kinetic.Text({
+				text		: images[i].text,
+				x			: images[i].x ,
+				y			: images[i].y + images[i].height + 2,
+				width 		: images[i].width,
+				align		: 'center',
+				fontStyle	: 'italic',
+				fontSize	: 12,
+				fontFamily	: "Calibri",
+				textFill	: "black"
+			});
+			group.add(icon);
+			group.add(label);
+			
+			group.on("touchstart mousedown", function() {
+				this.transitionTo({
+				easing: 'elastic-ease-out',
+					scale: {
+						x: 1.01,
+						y: 1.01
+					},
+					duration: 0.1
+				});
+			});
+			group.on("touchend mouseup", function() {
+				this.transitionTo({
+				easing: 'elastic-ease-out',
+					scale: {
+						x: 1,
+						y: 1
+					},
+					duration: 0.1
+				});
+			});
+			
+			shapesLayer.add(group);
+		}
+        stage.add(shapesLayer);
+      }
+
+    window.onload = function() {
+        var sources = [{
+			text :"foo",
+			image : "icon.svg",
+			x : 100,
+			y : 100,
+			width : 57,
+			height:57
+		},{
+			text :"bar",
+			image : "icon.svg",
+			x : 180,
+			y : 100,
+			width : 57,
+			height:57
+		},{
+			text :"far",
+			image : "icon.svg",
+			x : 260,
+			y : 100,
+			width : 72,
+			height:72
+		}];
+		
+        loadImages(sources, initStage);
+      };
+
+    </script>
+  </head>
+  <body>
+    <div id="container"></div>
+  </body>
+</html>

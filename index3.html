@@ -1,0 +1,101 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+      canvas {
+        border: 1px solid #9C9898;
+      }
+    </style>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.0.js"></script>
+    <script>
+      function writeMessage(messageLayer, message) {
+        var context = messageLayer.getContext();
+        messageLayer.clear();
+        context.font = '18pt Calibri';
+        context.fillStyle = 'black';
+        context.fillText(message, 10, 25);
+      }
+      function loadImages(sources, callback) {
+        var assetDir = 'http://www.html5canvastutorials.com/demos/assets/';
+        var images = {};
+        var loadedImages = 0;
+        var numImages = 0;
+        for(var src in sources) {
+          numImages++;
+        }
+        for(var src in sources) {
+          images[src] = new Image();
+          images[src].onload = function() {
+            if(++loadedImages >= numImages) {
+              callback(images);
+            }
+          };
+          images[src].src = assetDir + sources[src];
+        }
+      }
+      function initStage(images) {
+        var stage = new Kinetic.Stage({
+          container: 'container',
+          width: 578,
+          height: 200
+        });
+
+        var shapesLayer = new Kinetic.Layer();
+        var messageLayer = new Kinetic.Layer();
+
+        var monkey = new Kinetic.Image({
+          image: images.monkey,
+          x: 120,
+          y: 50
+        });
+
+        var lion = new Kinetic.Image({
+          image: images.lion,
+          x: 280,
+          y: 30
+        });
+
+        monkey.on('mouseover', function() {
+          writeMessage(messageLayer, 'mouseover monkey');
+        });
+
+        monkey.on('mouseout', function() {
+          writeMessage(messageLayer, '');
+        });
+
+        lion.on('mouseover', function() {
+          writeMessage(messageLayer, 'mouseover lion');
+        });
+
+        lion.on('mouseout', function() {
+          writeMessage(messageLayer, '');
+        });
+
+        lion.createImageBuffer(function() {
+          shapesLayer.drawBuffer();
+        });
+
+        shapesLayer.add(monkey);
+        shapesLayer.add(lion);
+        stage.add(shapesLayer);
+        stage.add(messageLayer);
+      }
+
+      window.onload = function() {
+        var sources = {
+          lion: 'lion.png',
+          monkey: 'monkey.png'
+        };
+        loadImages(sources, initStage);
+      };
+
+    </script>
+  </head>
+  <body>
+    <div id="container"></div>
+  </body>
+</html>

@@ -1,94 +1,128 @@
 <!DOCTYPE HTML>
 <html>
-	<head>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+      canvas {
+        border: 1px solid #9C9898;
+      }
+    </style>
+    <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.0.js"></script>
+    <script>
+    window.onload = function() {
+        var stage = new Kinetic.Stage({
+          container: "container",
+          width: 480,
+          height: 640
+        });
+		
+        var layer = new Kinetic.Layer();
 
-		<style>
-			body {
-				margin: 2px;
-				padding: 2px;
-			}
-			canvas {
-				border: 1px solid #9C9898;
-			}
-
-			#container {
-				background-image: url('http://www.html5canvastutorials.com/demos/assets/lines.jpg');
-			}
-		</style>
-
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.css" />
-		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-		<script src="http://code.jquery.com/mobile/1.1.0/jquery.mobile-1.1.0.min.js"></script>
-		<script src="http://www.html5canvastutorials.com/libraries/kinetic-v3.9.7.js"></script>
-		<script src="demo1.js"></script>
-		<script src="demo2.js"></script>
-
-		<script type="text/javascript">
-			$(document).bind("pageinit", function() {
-				console.log( "Init...");
+		//createIcon(stage, layer, 200, 200, 57, "icon.svg");
+		//createIcon(stage, layer, 300, 200, 57, "icon.svg");
+		
+		var x = 300;
+		var y = 300;
+		
+		
+		var group = new Kinetic.Group({
+			draggable : true
+		});
+		
+		var label = new Kinetic.Text({
+			x: x,
+			y: y,
+			text: "foo",
+			fontSize: 12,
+			fontFamily: "Calibri",
+			textFill: "black"
+		});
+		
+		var img = new Kinetic.Image({
+			image : new Image();
+		});
+			
+			group.on("touchstart mousedown", function() {
+				this.transitionTo({
+					scale: {
+						x: 1.05,
+						y: 1.05
+					},
+					duration: 0.5,
+					easing: "elastic-ease-out"
+				});
 			});
-		</script>
-        </head>
-		<body onmousedown="return false;">
+			group.on("touchend mouseup", function() {
+				this.transitionTo({
+					scale: {
+						x: 1,
+						y: 1
+					},
+					duration: 0.5,
+					easing: "elastic-ease-out"
+				});
+			});
+			
+			group.add(label);
+			layer.add(group);
+			stage.add(layer);
+	}
+	  
+	function createIcon(stage, layer, x, y, size, filePath) {
+		var imageObj = new Image();
+		imageObj.src = filePath;
+        imageObj.onload = function() {
+			var icon = new Kinetic.Image({
+				x: x,
+				y: y,
+				image: imageObj,
+				width: size,
+				height: size,
+				draggable : true
+			});
+			layer.add(icon);
+			
+			icon.on("touchstart mousedown", function() {
+				this.transitionTo({
+					scale: {
+						x: 1.05,
+						y: 1.05
+					},
+					duration: 0.5,
+					easing: "elastic-ease-out"
+				});
+			});
+			icon.on("touchend mouseup", function() {
+				this.transitionTo({
+					scale: {
+						x: 1,
+						y: 1
+					},
+					duration: 0.5,
+					easing: "elastic-ease-out"
+				});
+			});
+			var simpleText = new Kinetic.Text({
+			  x: x,
+			  y: y,
+			  text: "foo",
+			  fontSize: 12,
+			  fontFamily: "Calibri",
+			  textFill: "black"
+			});
+			
+			layer.add(simpleText);
+			
+		    stage.add(layer);
+		}
+	}
 
-			<!-- HomePage-->
-			<div data-role="page" id="homePage">
-				<div data-role="header">
-					<h1>PhoneGap- Kinetic.js Demo</h1>
-				</div>
-
-				<div data-role="content">
-					<a href="#demoPage1" data-role="button">Kinetic.js Demo - 1</a>
-					<a href="#demoPage2" data-role="button">Kinetic.js Demo - 2</a>
-
-				</div>
-
-				<div data-role="footer" data-position="fixed">
-					<h3>Footer</h3>
-				</div>
-			</div>
-
-			<!-- DemoPage1-->
-			<div data-role="page" id="demoPage1" data-theme="a">
-				<div data-role="header">
-					<a href="#homePage" data-icon="back" class="ui-btn-left">Back</a>
-					<h1>Kinetic.js Demo - 1 </h1>
-				</div>
-
-				<div data-role="content">
-					<div id="container"></div>
-				</div>
-
-				<div  data-role="footer"  class="ui-bar ui-bar-b" >
-					<h2>Kinetic.js Demo - 1</h2>
-				</div>
-				<script type="text/javascript">
-					demo1();
-				</script>
-				
-			</div>
-
-			<!-- DemoPage2-->
-			<div data-role="page" id="demoPage2" data-theme="a">
-				<div data-role="header">
-					<a href="#homePage" data-icon="back" class="ui-btn-left">Back</a>
-					<h1>Kinetic.js Demo - 2 </h1>
-				</div>
-
-				<div data-role="content">
-					<div id="container2"></div>
-				</div>
-
-				<div  data-role="footer"  class="ui-bar ui-bar-b" >
-					<a href="" id="start" data-role="button" class="ui-btn-left">Start</a>
-					<h2>Kinetic.js Demo - 2</h2>
-					<a href="" id="stop" data-role="button" class="ui-btn-right">Stop</a>
-				</div>
-				
-				<script type="text/javascript">
-					demo2();
-				</script>
-			</div>
-		</body>
+    </script>
+  </head>
+  <body onmousedown="return false;">
+    <div id="container"></div>
+  </body>
 </html>

@@ -10,71 +10,135 @@
         border: 1px solid #9C9898;
       }
     </style>
+	<script src="jq.mobi.min.js"></script>
     <script src="http://www.html5canvastutorials.com/libraries/kinetic-v4.0.0.js"></script>
     <script>
-      
+	
+	function getSize() {
+	  var myWidth = 0, myHeight = 0;
+	  if( typeof( window.innerWidth ) == 'number' ) {
+		//Non-IE
+		myWidth = window.innerWidth;
+		myHeight = window.innerHeight;
+	  } else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+		//IE 6+ in 'standards compliant mode'
+		myWidth = document.documentElement.clientWidth;
+		myHeight = document.documentElement.clientHeight;
+	  } else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+		//IE 4 compatible
+		myWidth = document.body.clientWidth;
+		myHeight = document.body.clientHeight;
+	  }
+	  return [myWidth,myHeight];
+	}
     function loadImages(sources, callback) {
-        var images = [];
+        var items = [];
         var loadedImages = 0;
         var numImages = sources.length;
 		
 		for(var i = 0; i < numImages; i++) {
-			images[i] = {};
-			images[i].text = sources[i].text;
-			images[i].x = sources[i].x;
-			images[i].y = sources[i].y;
-			images[i].width = sources[i].width;
-			images[i].height = sources[i].height;
-			images[i].img = new Image();
-			images[i].img.src =  sources[i].image;
-			images[i].img.onload = function() {
+			items[i] = {};
+			items[i].text = sources[i].text;
+			items[i].x = sources[i].x;
+			items[i].y = sources[i].y;
+			items[i].width = sources[i].width;
+			items[i].height = sources[i].height;
+			items[i].badge = sources[i].badge;
+			items[i].img = new Image();
+			items[i].img.src =  sources[i].image;
+			items[i].img.onload = function() {
 				if(++loadedImages >= numImages) {
-					callback(images);
+					callback(items);
 				}
 			};
 		}
     }
 	  
-    function initStage(images) {		
+    function initStage(items) {
+		
         var stage = new Kinetic.Stage({
           container: 'container',
-          width: 480,
-          height: 640
+          width: window.innerWidth,
+          height:window.innerHeight
         });
 
         var shapesLayer = new Kinetic.Layer();
 		
-		for (var i = 0 ; i < images.length; i ++) {
+		for (var i = 0 ; i < items.length; i ++) {
+		  var x = items[i].x;
+		  var y = items[i].y;
+		  var w = items[i].width;
+		  var h = items[i].height;
+		  
 			var group = new Kinetic.Group({
-				draggable : true
+				draggable : true/*,
+				dragBounds: {
+				  top: y + 5,
+				  right: 200,
+				  bottom: 200,
+				  left: x + 5
+				}*/
 			});
 			var icon = new Kinetic.Image({
-				image		: images[i].img,
-				x			: images[i].x,
-				y			: images[i].y,
-				width		: images[i].width,
-				height		: images[i].height
+				image		: items[i].img,
+				x			: x,
+				y			: y,
+				width		: w,
+				height		: h
 			});
 			var label = new Kinetic.Text({
-				text		: images[i].text,
-				x			: images[i].x ,
-				y			: images[i].y + images[i].height + 2,
-				width 		: images[i].width,
+				text		: items[i].text,
+				x			: x ,
+				y			: y + h + 10,
+				width 		: w,
 				align		: 'center',
-				fontStyle	: 'italic',
-				fontSize	: 12,
-				fontFamily	: "Calibri",
-				textFill	: "black"
+				fontSize	: 28,
+				fontStyle 	: "bold",
+				fontFamily	: "HelveticaNeue",
+				textFill	: "white",
+				textStrokeWidth : 1,
+				shadow 		: true
 			});
-			group.add(icon);
-			group.add(label);
 			
-			group.on("touchstart mousedown", function() {
+			var badge = new Kinetic.Group({
+			  visible : items[i].badge
+			});
+			var circle = new Kinetic.Circle({
+				x			: x + 10,
+				y			: y + 10,
+				radius		: 20,
+				fill		: "black",
+				stroke		: "white",
+				strokeWidth	: 4
+			});
+			var cross1 = new Kinetic.Line({
+			  points		: [x + 3, y + 3, x + 17, y + 17],
+			  stroke 		: "white",
+			  strokeWidth 	: 5,
+	          lineCap		: "round",
+	          lineJoin		: "round"
+			});
+			var cross2 = new Kinetic.Line({
+			  points		: [x + 3, y + 17, x + 17, y + 3],
+			  stroke 		: "white",
+			  strokeWidth 	: 5,
+	          lineCap		: "round",
+	          lineJoin		: "round"
+			});
+			badge.add(circle);
+			badge.add(cross1);
+			badge.add(cross2);
+			
+			group.add(icon);
+			group.add(badge);
+			group.add(label);
+			group.add(badge);
+			/*group.on("touchstart mousedown", function() {
 				this.transitionTo({
 				easing: 'elastic-ease-out',
 					scale: {
-						x: 1.01,
-						y: 1.01
+						x: 1.1,
+						y: 1.1
 					},
 					duration: 0.1
 				});
@@ -88,7 +152,7 @@
 					},
 					duration: 0.1
 				});
-			});
+			});*/
 			
 			shapesLayer.add(group);
 		}
@@ -97,26 +161,37 @@
 
     window.onload = function() {
         var sources = [{
-			text :"foo",
+			text :"Poids",
 			image : "icon.svg",
-			x : 100,
-			y : 100,
-			width : 57,
-			height:57
+			x : 50,
+			y : 50,
+			width : 180,
+			height:180,
+			badge : false
 		},{
-			text :"bar",
+			text :"Taille",
 			image : "icon.svg",
-			x : 180,
-			y : 100,
-			width : 57,
-			height:57
+			x : 300,
+			y : 50,
+			width : 180,
+			height:180,
+			badge : false
 		},{
-			text :"far",
+			text :"Biberons",
 			image : "icon.svg",
-			x : 260,
-			y : 100,
-			width : 72,
-			height:72
+			x : 550,
+			y : 50,
+			width : 180,
+			height:180,
+			badge : true
+		},{
+			text :"Couches",
+			image : "icon.svg",
+			x : 50,
+			y : 300,
+			width : 180,
+			height:180,
+			badge : false
 		}];
 		
         loadImages(sources, initStage);
@@ -124,7 +199,7 @@
 
     </script>
   </head>
-  <body>
-    <div id="container"></div>
+  <body bgcolor="gray">
+	<div id="container"></div>
   </body>
 </html>
